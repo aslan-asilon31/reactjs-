@@ -7,10 +7,6 @@ const productStore = create((set) => ({
   loading: false,  
   error: null,  
   
-
-
-
-
   fetchProducts: async () => {  
     set({ loading: true });  
     try {  
@@ -31,22 +27,15 @@ const productStore = create((set) => ({
   
   createProduct: async (product) => {  
     try {  
-      // const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
-      // if (csrfTokenMeta) {
-      //     const csrfToken = csrfTokenMeta.getAttribute('content');
-      //     axios.defaults.headers.common['X-CSRF-TOKEN'] = csrfToken;
-      // } else {
-      //     console.error('CSRF token meta tag not found');
-      // }
-      
-      // alert('berhasil',product);
-
-      // const response = await axios.post('http://localhost:8000/api/products/store', product);
-      // set((state) => ({ products: [...state.products, response.data] }));
+      // const response = await axios.post('https://fakestoreapi.com/products', product);  
+      // Ambil token CSRF dari cookie
+      const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+      // Set token CSRF di header Axios
+      axios.defaults.headers.common['X-CSRF-TOKEN'] = csrfToken;
+      alert('berhasil',product);
 
       const response = await axios.post('http://localhost:8000/api/products/store', product);
-      console.log('Product created:', response.data);
-
+      set((state) => ({ products: [...state.products, response.data] }));
     } catch (error) { 
       alert('gaagal',error);
       alert(error);
@@ -78,10 +67,6 @@ const productStore = create((set) => ({
       console.error(error);  
     }  
   },  
-
-
-
-
 }));  
   
 export default productStore;  

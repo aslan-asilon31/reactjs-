@@ -1,0 +1,28 @@
+import React from "react";
+import { Product } from "../../types/Product"; // Pastikan path ini benar
+
+
+export { };
+
+interface ProductListProps {
+    products: Product[];
+}
+
+const ProductList: React.FC<ProductListProps> = ({ products }) => {
+    return (
+        <div>
+            <h1>Daftar Produk</h1>
+            <ul>
+                {products.map((product) => (
+                    <li key={product.id}>
+                        <h2>{product.name}</h2>
+                        <p>Harga Jual: {product.selling_price}</p>
+                        {/* Tambahkan informasi produk lainnya sesuai kebutuhan */}
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
+};
+
+export default ProductList;
