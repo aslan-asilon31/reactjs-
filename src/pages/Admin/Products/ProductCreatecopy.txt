@@ -1,0 +1,69 @@
+// src/pages/Products/ProductCreate.tsx
+import { useState } from 'react';
+import useProductStore from '../../../stores/productStore';
+
+
+export default function ProductCreate() {
+  const {error , createProduct} = useProductStore();
+
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
+  
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault(); // Mencegah reload halaman
+    setLoading(true);
+    try {
+      // Dapatkan nilai dari form
+      const name = (document.getElementById('name') as HTMLInputElement).value;
+      const selling_price = parseFloat((document.getElementById('selling_price') as HTMLInputElement).value);
+
+      // Validasi input
+      if (!name || isNaN(selling_price)) {
+        setMessage('Nama dan harga jual harus diisi.');
+        return;
+      }
+
+      // Buat produk baru
+      const response = await createProduct({ name, selling_price });
+      if (response.status === 200) {
+        setMessage('Data gagal ditambahkan!'); // Tampilkan pesan sukses
+      } else {
+        setMessage('Gagal menambahkan data.'); // Tampilkan pesan kesalahan
+      }
+
+      // Reset form
+      (document.getElementById('name') as HTMLInputElement).value = '';
+      (document.getElementById('selling_price') as HTMLInputElement).value = '';
+      setMessage('data berhasil ditambahkan.');
+
+    } catch (err: any) {
+      setMessage('data berhasil ditambahkan.');
+    } finally {
+      setLoading(false); // Set loading ke false setelah proses selesai
+    }
+  };
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+
+
+  return (
+    <div>
+      <h2>Tambah Produk Baru</h2>
+      {message && <div style={{ color: 'green' }}>{message}</div>}
+      {error && <div style={{ color: 'red' }}>{error}</div>}
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label htmlFor="name">Nama Produk:</label>
+          <input type="text" id="name" name="name" required />
+        </div>
+        <div>
+          <label htmlFor="selling_price">Harga Jual:</label>
+          <input type="number" id="selling_price" name="selling_price" required />
+        </div>
+        <button type="submit">Tambah Produk</button>
+      </form>
+    </div>
+  );
+}

@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router";
-import GridShape from "../../components/common/GridShape";
-import Input from "../../components/form/input/InputField";
-import Label from "../../components/form/Label";
-import { EyeCloseIcon, EyeIcon } from "../../icons";
-import Checkbox from "../../components/form/input/Checkbox";
-import PageMeta from "../../components/common/PageMeta";
+import GridShape from "../../../components/common/GridShape";
+import PageMeta from "../../../components/common/PageMeta";
+import Checkbox from "../../../components/form/input/Checkbox";
+import Input from "../../../components/form/input/InputField";
+import Label from "../../../components/form/Label";
+import { EyeCloseIcon, EyeIcon } from "../../../icons";
 
 export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false);

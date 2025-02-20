@@ -1,16 +1,25 @@
-import { useEffect } from "react";
 import { Route, BrowserRouter as Router, Routes } from "react-router";
 import AppLayout from "./layout/AppLayout";
 import AuthLayout from "./layout/AuthLayout";
-import SignIn from "./pages/AuthPages/SignIn";
-import SignUp from "./pages/AuthPages/SignUp";
+import SignIn from "./pages/Admin/AuthPages/SignIn";
+import SignUp from "./pages/Admin/AuthPages/SignUp";
+import Ecommerce from "./pages/Admin/Dashboard/ECommerce";
+import ProductCreate from "./pages/Admin/Products/ProductCreate";
+import ProductEdit from "./pages/Admin/Products/ProductEdit";
+import ProductList from "./pages/Admin/Products/ProductList";
+
+import BrandCreate from "./pages/Admin/Brands/BrandCreate";
+import BrandList from "./pages/Admin/Brands/BrandList";
+
+
+import CategoryCreate from "./pages/Admin/Categories/CategoryCreate";
+import CategoryList from "./pages/Admin/Categories/CategoryList";
+
 import Blank from "./pages/Blank";
 import Calendar from "./pages/Calendar";
-import Ecommerce from "./pages/Dashboard/ECommerce";
 import FormElements from "./pages/Forms/FormElements";
 import NotFound from "./pages/OtherPage/NotFound";
-import ProductCreate from "./pages/Products/ProductCreate";
-import ProductList from "./pages/Products/ProductList";
+
 
 import BasicTables from "./pages/Tables/BasicTables";
 import Alerts from "./pages/UiElements/Alerts";
@@ -20,15 +29,9 @@ import Buttons from "./pages/UiElements/Buttons";
 import Images from "./pages/UiElements/Images";
 import Videos from "./pages/UiElements/Videos";
 import UserProfiles from "./pages/UserProfiles";
-import productStore from './stores/productStore';
 
 export default function App() {
 
-  const { fetchProducts, products } = productStore();
-
-  useEffect(() => {
-    fetchProducts(); 
-  }, [fetchProducts]);
 
   return (
     <>
@@ -40,6 +43,13 @@ export default function App() {
             {/* Others Page */}
             <Route path="/product" element={<ProductList  />} />
             <Route path="/product/create" element={<ProductCreate  />} />
+            <Route path="/product/edit/:id" element={<ProductEdit />} />
+
+            <Route path="/brand" element={<BrandList  />} />
+            <Route path="/brand/create" element={<BrandCreate  />} />
+
+            <Route path="/category" element={<CategoryList  />} />
+            <Route path="/category/create" element={<CategoryCreate  />} />
 
 
             <Route path="/profile" element={<UserProfiles />} />
