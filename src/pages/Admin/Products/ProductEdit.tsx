@@ -1,84 +1,83 @@
-// src/components/ProductEdit.tsx
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import productStore from '../../../stores/productStore';
 
 const ProductEdit = () => {
-  const { id } = useParams(); // Mengambil ID dari URL
+  const { id } = useParams();
   const navigate = useNavigate();
   const [name, setName] = useState('');
-  const [sellingPrice, setSellingPrice] = useState('');
+  const [selling_price, setSellingPrice] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true); // To handle loading state
+
+  const fetchProductById = productStore((state) => state.fetchProductById);
   const updateProduct = productStore((state) => state.updateProduct);
-  const products = productStore((state) => state.products);
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
-  
 
   useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        // Mengambil produk berdasarkan ID
-        const product = await productStore.getProductById(id);
-        if (product) {
-          setName(product.name);
-          setSellingPrice(product.selling_price);
-        } else {
-          setError('Produk tidak ditemukan');
-        }
-      } catch (err) {
-        setError('Terjadi kesalahan saat mengambil data produk');
-        console.error(err);
+    if (!id) return; // Early exit if id is not available
+    const fetchData = async () => {
+      setLoading(true); // Set loading to true when starting the fetch
+      const product = await fetchProductById(id); // Use id from URL
+      if (product) {
+        setName(product.name);
+        setSellingPrice(product.selling_price);
+        setError('');
+      } else {
+        setError('Product not found');
       }
+      setLoading(false); // Set loading to false when data is fetched
     };
 
-    fetchProduct();
-  }, [id]);
+    fetchData();
+  }, [id, fetchProductById]);
 
-  const handleSubmit = async (e) => {
+  const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setLoading(true);
 
-    const updatedProduct = {
-      name,
-      selling_price: sellingPrice,
-    };
-
-    try {
-      await updateProduct(id, updatedProduct);
-      alert(id, updatedProduct);
-      alert('Product updated successfully!');
-      navigate(`/product/edit/${id}`); // Redirect ke halaman utama atau daftar produk
-    } catch (error) {
-      setError('Failed to update product');
-      console.error(error);
+    if (!name || !selling_price) {
+      setError('All fields are required');
+      return;
     }
+
+    const update_data = await updateProduct(id, {name,selling_price});
+
+    setLoading(false);
+
+    if (update_data) {
+      alert("data gagal di update !");
+    }else{
+      alert("data berhasil di update !");
+    }
+
   };
+
+  if (loading) {
+    return <p>Loading...</p>; // Show loading message while fetching data
+  }
 
   return (
     <div>
-      <h2>Edit Product</h2>
+      <h1>Edit Product</h1>
       {error && <p style={{ color: 'red' }}>{error}</p>}
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleUpdate}>
         <div>
-          <label>Name:</label>
+          <label>Product Name:</label>
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            required
           />
         </div>
         <div>
           <label>Selling Price:</label>
           <input
-            type="text"
-            value={sellingPrice}
+            type="number"
+            value={selling_price}
             onChange={(e) => setSellingPrice(e.target.value)}
-            required
           />
         </div>
-        <button type="submit">Update Product</button>
+        <button type="submit" className="">Update Product</button>
       </form>
     </div>
   );

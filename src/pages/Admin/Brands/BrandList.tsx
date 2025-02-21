@@ -4,10 +4,14 @@ import { useNavigate } from 'react-router-dom'; // Import useNavigate untuk navi
 import useBrandStore from '../../../stores/brandStore';
 
 export default function BrandList() {
-  const { brands, error, fetchBrands } = useBrandStore();
+  const { brands, error  } = useBrandStore();
   const navigate = useNavigate(); // Inisialisasi useNavigate
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+
+  const fetchBrands = useBrandStore((state) => state.fetchBrands);
+
+
   
   useEffect(() => {
     fetchBrands();

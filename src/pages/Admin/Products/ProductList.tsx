@@ -4,11 +4,14 @@ import { useNavigate } from 'react-router-dom'; // Import useNavigate untuk navi
 import useProductStore from '../../../stores/productStore';
 
 export default function ProductList() {
-  const { products, error, fetchProducts, deleteProduct } = useProductStore();
+  const { products, error } = useProductStore();
   const navigate = useNavigate(); // Inisialisasi useNavigate
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   
+  const fetchProducts = useProductStore((state) => state.fetchProducts);
+  const deleteProduct = useProductStore((state) => state.deleteProduct);
+
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
@@ -16,8 +19,6 @@ export default function ProductList() {
   const handleEdit = (id) => {
     navigate(`product/edit/${id}`); // Navigasi ke halaman edit produk
   };
-
-
 
   const handleDelete = async (id) => {
     if (window.confirm('Apakah Anda yakin ingin menghapus produk ini?')) {
@@ -41,12 +42,26 @@ export default function ProductList() {
     }
   };
 
+    // Function to handle navigation
+    const handleCreate = () => {
+      navigate('/product/create');
+    };
+
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
   return (
     <div>
       <h1>Daftar Produk</h1>
+      <div className="mt-4">
+      <button
+        onClick={handleCreate} // Add onClick event handler
+        className="bg-green-600 text-white rounded-sm p-2"
+      >
+        Add Product +
+      </button>
+      </div>
         <table>
           <thead>
             <tr>

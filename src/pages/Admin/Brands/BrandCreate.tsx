@@ -4,16 +4,16 @@ import useBrandStore from '../../../stores/brandStore';
 
 // Skema validasi menggunakan Zod
 const brandSchema = z.object({
-  name: z.string().min(1, 'Nama produk harus diisi'),
-  selling_price: z.number().min(0, 'Harga harus lebih besar dari 0'),
+  name: z.string().min(1, 'Nama Brand harus diisi'),
 });
 
 export default function BrandCreate() {
-  const { createBrand, error } = useBrandStore();
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [validationErrors, setValidationErrors] = useState({});
+
+  const storeBrand = useBrandStore((state) => state.storeBrand);
 
   const handleSubmit = async (e) => {
     e.preventDefault(); // Mencegah reload halaman
@@ -22,9 +22,8 @@ export default function BrandCreate() {
     setValidationErrors({});
 
     // Validasi data menggunakan Zod
-    const result = BrandSchema.safeParse({
+    const result = brandSchema.safeParse({
       name,
-      selling_price: parseFloat(sellingPrice),
     });
 
     if (!result.success) {
@@ -39,7 +38,7 @@ export default function BrandCreate() {
 
     // Jika validasi berhasil, simpan produk
     try {
-      await createBrand({
+      await storeBrand({
         name,
       });
       setMessage('Brand berhasil ditambahkan!');

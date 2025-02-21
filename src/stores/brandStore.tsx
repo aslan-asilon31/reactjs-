@@ -11,7 +11,7 @@ interface Brand {
 interface brandStore {
   brands: Brand[];
   fetchBrands: () => Promise<void>;
-  createBrand: (brands: Brand) => Promise<void>;
+  storeBrand: (brands: Brand) => Promise<void>;
   error: string | null;
 }
 
@@ -36,7 +36,7 @@ const brandStore = create((set) => ({
   },  
   
 
-  createBrand: async (brand) => {
+  storeBrand: async (brand) => {
     try {
         // Ambil token CSRF dari meta tag
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');

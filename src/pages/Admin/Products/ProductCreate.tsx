@@ -1,87 +1,160 @@
-import { useState } from 'react';
-import { z } from 'zod';
+import React from 'react';
+import { useForm } from "react-hook-form";
 import useProductStore from '../../../stores/productStore';
 
-// Skema validasi menggunakan Zod
-const productSchema = z.object({
-  name: z.string().min(1, 'Nama produk harus diisi'),
-  selling_price: z.number().min(0, 'Harga harus lebih besar dari 0'),
-});
-
+// Komponen ProductCreate
 export default function ProductCreate() {
-  const { createProduct, error } = useProductStore();
-  const [name, setName] = useState('');
-  const [sellingPrice, setSellingPrice] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
-  const [validationErrors, setValidationErrors] = useState({});
+  const storeProduct = useProductStore((state) => state.storeProduct);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault(); // Mencegah reload halaman
-    setLoading(true);
-    setMessage('');
-    setValidationErrors({});
+  const {
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
 
-    // Validasi data menggunakan Zod
-    const result = productSchema.safeParse({
-      name,
-      selling_price: parseFloat(sellingPrice),
-    });
+  const onSubmit = async (data) => {
 
-    if (!result.success) {
-      // Jika validasi gagal, set error
-      const errors = result.error.format();
-      setValidationErrors({
-        name: errors.name ? errors.name[0].message : '',
-        selling_price: errors.selling_price ? errors.selling_price[0].message : '',
-      });
-      setLoading(false);
+    if (!data.product_category_first_id) {
+      alert('Nama Kategori harus diisi');
       return;
     }
 
-    // Jika validasi berhasil, simpan produk
+    if (!data.product_brand_id) {
+      alert('Nama Brand harus diisi');
+      return;
+    }
+
+    if (!data.name) {
+      alert('Nama produk harus diisi');
+      return;
+    }
+
+    if (data.selling_price <= 0) {
+      alert('Harga harus lebih besar dari 0');
+      return;
+    }
+
+    
+    if (!data.discount_persentage) {
+      alert('discount Percentage harus diisi');
+      return;
+    }
+
+    
+    if (!data.discount_value) {
+      alert('Discount value harus diisi');
+      return;
+    }
+
+    if (!data.availability) {
+      alert('availability harus diisi');
+      return;
+    }
+
     try {
-      await createProduct({
-        name,
-        selling_price: parseFloat(sellingPrice),
+      await storeProduct({
+        product_category_first_id: data.product_category_first_id,
+        product_brand_id: data.product_brand_id,
+        name: data.name,
+        selling_price: parseFloat(data.selling_price),
+        discount_persentage: data.discount_persentage,
+        discount_value: data.discount_value,
+        nett_price: data.nett_price,
+        availability: data.availability,
       });
-      setMessage('Produk berhasil ditambahkan!');
-      setName('');
-      setSellingPrice('');
+      // Navigasi ke halaman lain jika diperlukan
     } catch (err) {
-      setMessage('Terjadi kesalahan saat menambahkan produk.');
-    } finally {
-      setLoading(false);
+      console.error('Terjadi kesalahan saat menambahkan produk:', err);
     }
   };
 
   return (
     <div>
       <h1>Tambah Produk</h1>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', justifyContent: 'space-between' }}>
+      <div style={{ flex: 1, marginRight: '10px' }}>
         <div>
-          <label>Nama Produk:</label>
+          <label htmlFor="product_category_first_id">Produk Kategori ID</label>
+          <br />
           <input
             type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            {...register("product_category_first_id")} // Menghubungkan input dengan React Hook Form
           />
-          {validationErrors.name && <p style={{ color: 'red' }}>{validationErrors.name}</p>}
+          {errors.product_category_first_id && <p style={{ color: 'red' }}>{errors.product_category_first_id.message}</p>}
         </div>
         <div>
-          <label>Harga:</label>
+          <label htmlFor="product_brand_id">Produk Brand ID</label>
+          <br />
+          <input
+            type="text"
+            {...register("product_brand_id")} // Menghubungkan input dengan React Hook Form
+          />
+          {errors.product_brand_id && <p style={{ color: 'red' }}>{errors.product_brand_id.message}</p>}
+        </div>
+        <div>
+          <label htmlFor="name">Nama Produk</label>
+          <br />
+          <input
+            type="text"
+            {...register("name")}
+          />
+          {errors.name && <p style={{ color: 'red' }}>{errors.name.message}</p>}
+        </div>
+        <div>
+          <label htmlFor="selling_price">Selling Price</label>
+          <br />
           <input
             type="number"
-            value={sellingPrice}
-            onChange={(e) => setSellingPrice(e.target.value)}
+            {...register("selling_price")}
           />
-          {validationErrors.selling_price && <p style={{ color: 'red' }}>{validationErrors.selling_price}</p>}
+          {errors.selling_price && <p style={{ color: 'red' }}>{errors.selling_price.message}</p>}
         </div>
-        <button type="submit" disabled={loading}>
-          {loading ? 'Loading...' : 'Tambah Produk'}
-        </button>
-      </form>
-      {message && <p>{message}</p>}
+      </div>
+
+
+      <div style={{ flex: 1, marginLeft: '10px' }}>
+        <div>
+          <label htmlFor="discount_persentage">Discount Percentage</label>
+          <br />
+          <input
+            type="number"
+            {...register("discount_persentage")}
+          />
+          {errors.discount_persentage && <p style={{ color: 'red' }}>{errors.discount_persentage.message}</p>}
+        </div>
+
+        <div>
+          <label htmlFor="discount_value">Discount Value</label>
+          <br />
+          <input
+            type="number"
+            {...register("discount_value")}
+          />
+          {errors.discount_value && <p style={{ color: 'red' }}>{errors.discount_value.message}</p>}
+        </div>
+
+        <div>
+          <label htmlFor="nett_price">Net Price</label>
+          <br />
+          <input
+            type="number"
+            {...register("nett_price")}
+          />
+          {errors.nett_price && <p style={{ color: 'red' }}>{errors.nett_price.message}</p>}
+        </div>
+
+        <div>
+          <label htmlFor="availability">Availability</label>
+          <br />
+          <input
+            type="number"
+            {...register("availability")}
+          />
+          {errors.availability && <p style={{ color: 'red' }}>{errors.availability.message}</p>}
+        </div>
+      </div>
+
+      <button type="submit">Kirim</button>
+    </form>
       {error && <p style={{ color: 'red' }}>{error}</p>}
     </div>
   );
