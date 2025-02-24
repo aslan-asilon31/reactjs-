@@ -1,17 +1,31 @@
 import React from 'react';
-import { useForm } from "react-hook-form";
+import { useForm, SubmitHandler } from "react-hook-form";
 import useProductStore from '../../../stores/productStore';
+
+
+
+interface FormValues {
+  product_category_first_id: string;
+  product_brand_id: string;
+  name: string;
+  selling_price: number;
+  nett_price: number;
+  discount_persentage: number;
+  discount_value: number;
+  availability: boolean;
+}
 
 // Komponen ProductCreate
 export default function ProductCreate() {
-  const storeProduct = useProductStore((state) => state.storeProduct);
+  const storeProduct = useProductStore((state:any) => state.storeProduct);
 
   const {
     handleSubmit,
     formState: { errors },
+    register,
   } = useForm();
 
-  const onSubmit = async (data) => {
+  const onSubmit: SubmitHandler<FormValues> = async data => {
 
     if (!data.product_category_first_id) {
       alert('Nama Kategori harus diisi');
@@ -29,6 +43,11 @@ export default function ProductCreate() {
     }
 
     if (data.selling_price <= 0) {
+      alert('Harga harus lebih besar dari 0');
+      return;
+    }
+
+    if (data.nett_price <= 0) {
       alert('Harga harus lebih besar dari 0');
       return;
     }
@@ -55,7 +74,7 @@ export default function ProductCreate() {
         product_category_first_id: data.product_category_first_id,
         product_brand_id: data.product_brand_id,
         name: data.name,
-        selling_price: parseFloat(data.selling_price),
+        selling_price: data.selling_price,
         discount_persentage: data.discount_persentage,
         discount_value: data.discount_value,
         nett_price: data.nett_price,
@@ -77,9 +96,9 @@ export default function ProductCreate() {
           <br />
           <input
             type="text"
-            {...register("product_category_first_id")} // Menghubungkan input dengan React Hook Form
+            {...register("product_category_first_id", { required: "This field is required" })} 
           />
-          {errors.product_category_first_id && <p style={{ color: 'red' }}>{errors.product_category_first_id.message}</p>}
+         
         </div>
         <div>
           <label htmlFor="product_brand_id">Produk Brand ID</label>
@@ -88,7 +107,7 @@ export default function ProductCreate() {
             type="text"
             {...register("product_brand_id")} // Menghubungkan input dengan React Hook Form
           />
-          {errors.product_brand_id && <p style={{ color: 'red' }}>{errors.product_brand_id.message}</p>}
+          {/* {errors.product_brand_id && <p style={{ color: 'red' }}>{errors.product_brand_id.message}</p>} */}
         </div>
         <div>
           <label htmlFor="name">Nama Produk</label>
@@ -97,7 +116,6 @@ export default function ProductCreate() {
             type="text"
             {...register("name")}
           />
-          {errors.name && <p style={{ color: 'red' }}>{errors.name.message}</p>}
         </div>
         <div>
           <label htmlFor="selling_price">Selling Price</label>
@@ -106,7 +124,6 @@ export default function ProductCreate() {
             type="number"
             {...register("selling_price")}
           />
-          {errors.selling_price && <p style={{ color: 'red' }}>{errors.selling_price.message}</p>}
         </div>
       </div>
 
@@ -119,7 +136,6 @@ export default function ProductCreate() {
             type="number"
             {...register("discount_persentage")}
           />
-          {errors.discount_persentage && <p style={{ color: 'red' }}>{errors.discount_persentage.message}</p>}
         </div>
 
         <div>
@@ -129,7 +145,6 @@ export default function ProductCreate() {
             type="number"
             {...register("discount_value")}
           />
-          {errors.discount_value && <p style={{ color: 'red' }}>{errors.discount_value.message}</p>}
         </div>
 
         <div>
@@ -139,7 +154,6 @@ export default function ProductCreate() {
             type="number"
             {...register("nett_price")}
           />
-          {errors.nett_price && <p style={{ color: 'red' }}>{errors.nett_price.message}</p>}
         </div>
 
         <div>
@@ -149,13 +163,11 @@ export default function ProductCreate() {
             type="number"
             {...register("availability")}
           />
-          {errors.availability && <p style={{ color: 'red' }}>{errors.availability.message}</p>}
         </div>
       </div>
 
       <button type="submit">Kirim</button>
     </form>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
     </div>
   );
 }

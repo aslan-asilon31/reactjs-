@@ -2,20 +2,32 @@ import { useState } from 'react';
 import { z } from 'zod';
 import useBrandStore from '../../../stores/brandStore';
 
+
+type BrandCreate = {
+  name: string;
+  error: string | null; 
+}
+
+interface ValidationErrors {
+  name?: string; // Optional property for name validation error
+}
+
 // Skema validasi menggunakan Zod
 const brandSchema = z.object({
   name: z.string().min(1, 'Nama Brand harus diisi'),
 });
 
+
 export default function BrandCreate() {
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState('');
-  const [validationErrors, setValidationErrors] = useState({});
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
 
-  const storeBrand = useBrandStore((state) => state.storeBrand);
+  const storeBrand = useBrandStore((state:any) => state.storeBrand);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e:any) => {
     e.preventDefault(); // Mencegah reload halaman
     setLoading(true);
     setMessage('');

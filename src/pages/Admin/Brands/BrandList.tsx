@@ -3,16 +3,21 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate untuk navigasi
 import useBrandStore from '../../../stores/brandStore';
 
+interface Brand {
+  id: number; // or string, depending on your data
+  name: string;
+}
+
 export default function BrandList() {
-  const { brands, error  } = useBrandStore();
+  
+  const { brands, error } = useBrandStore() as { brands: Brand; error: string | null };
+
   const navigate = useNavigate(); // Inisialisasi useNavigate
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
 
-  const fetchBrands = useBrandStore((state) => state.fetchBrands);
+  const fetchBrands = useBrandStore((state:any) => state.fetchBrands);
 
-
-  
   useEffect(() => {
     fetchBrands();
   }, [fetchBrands]);
@@ -33,12 +38,12 @@ export default function BrandList() {
             </tr>
           </thead>
           <tbody>
-            {brands.map((brand) => (
+            {Array.isArray(brands) && brands.map((brand) => (
               <tr key={brand.id}>
                 <td>{brand.name}</td>
                 <td>
-                  <button >Edit</button>
-                  <button >Delete</button>
+                  <button>Edit</button>
+                  <button>Delete</button>
                 </td>
               </tr>
             ))}

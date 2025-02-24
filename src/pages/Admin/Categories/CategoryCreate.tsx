@@ -8,15 +8,27 @@ const productSchema = z.object({
   selling_price: z.number().min(0, 'Harga harus lebih besar dari 0'),
 });
 
+interface ProductCreate {
+  createProduct: (product: { name: string; selling_price: number }) => Promise<void>;
+  error: string | null;
+}
+
+interface ValidationErrors {
+  name?: string; // Optional property for name validation error
+  selling_price?: number; // Optional property for name validation error
+}
+
 export default function ProductCreate() {
-  const { createProduct, error } = useProductStore();
+  const { createProduct } = useProductStore() as { createProduct: (product: { name: string; selling_price: number }) => Promise<void>; error: string | null };
+
   const [name, setName] = useState('');
   const [sellingPrice, setSellingPrice] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
-  const [validationErrors, setValidationErrors] = useState({});
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e:any) => {
     e.preventDefault(); // Mencegah reload halaman
     setLoading(true);
     setMessage('');

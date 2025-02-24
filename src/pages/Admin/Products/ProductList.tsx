@@ -4,23 +4,23 @@ import { useNavigate } from 'react-router-dom'; // Import useNavigate untuk navi
 import useProductStore from '../../../stores/productStore';
 
 export default function ProductList() {
-  const { products, error } = useProductStore();
+
   const navigate = useNavigate(); // Inisialisasi useNavigate
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   
-  const fetchProducts = useProductStore((state) => state.fetchProducts);
-  const deleteProduct = useProductStore((state) => state.deleteProduct);
+  const fetchProducts = useProductStore((state:any) => state.fetchProducts);
+  const deleteProduct = useProductStore((state:any) => state.deleteProduct);
 
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
 
-  const handleEdit = (id) => {
+  const handleEdit = (id:any) => {
     navigate(`product/edit/${id}`); // Navigasi ke halaman edit produk
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (id:any) => {
     if (window.confirm('Apakah Anda yakin ingin menghapus produk ini?')) {
       setLoading(true); // Set loading ke true sebelum memulai proses penghapusan
       try {
@@ -49,7 +49,6 @@ export default function ProductList() {
 
 
   if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
 
   return (
     <div>
@@ -71,16 +70,18 @@ export default function ProductList() {
             </tr>
           </thead>
           <tbody>
-            {products.map((product) => (
+
+          {Array.isArray(fetchProducts) && fetchProducts.map((product) => (
               <tr key={product.id}>
-                <td>{product.name}</td>
-                <td>{product.selling_price}</td>
-                <td>
-                  <button onClick={() => handleEdit(product.id)}>Edit</button>
-                  <button onClick={() => handleDelete(product.id)}>Delete</button>
-                </td>
-              </tr>
-            ))}
+              <td>{product.name}</td>
+              <td>{product.selling_price}</td>
+              <td>
+                <button onClick={() => handleEdit(product.id)}>Edit</button>
+                <button onClick={() => handleDelete(product.id)}>Delete</button>
+              </td>
+            </tr>
+          ))}
+
           </tbody>
         </table>
 

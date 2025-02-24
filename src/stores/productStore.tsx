@@ -24,12 +24,18 @@ interface ProductStore {
   error: string | null;
 }
 
+interface UpdateProductPayload {
+  id: number; // or string, depending on your use case
+  updatedData: Product; // Assuming Product is your existing type
+}
+
 const productStore = create((set) => ({  
   products: [],  
   loading: false,  
   error: null,  
   
-  
+  updateProduct: (id: number, updatedProduct: UpdateProductPayload) => Promise<void>;
+
   fetchProductById: async (id: string) => {
     try {
       const response = await axios.get(`http://localhost:8000/api/products/${id}`);
@@ -83,28 +89,48 @@ const productStore = create((set) => ({
     }
   },
 
-
-  updateProduct: async (id: any, updatedProduct: any) => {
-    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content'); // Ambil token CSRF
-    try {
-      const response = await axios.put(
-        `http://localhost:8000/api/products/update/${id}`,
-        updatedProduct,
-        {
-          headers: {
-            "X-CSRF-TOKEN": csrfToken,  // Menambahkan token CSRF
-          },
-        }
-      );
-      set((state: { products: any[]; }) => ({
-        products: state.products.map((product: { id: any; }) =>
-          product.id === id ? { ...product, ...response.data.data } : product
-        ),
-      }));
-    } catch (error) {
-      console.error(error);
-    }
+  updateProduct: async (id: number, updatedProduct: UpdateProductPayload) => {
+      const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content'); // Get CSRF token
+      try {
+          const response = await axios.put(
+              `http://localhost:8000/api/products/update/${id}`,
+              updatedProduct,
+              {
+                  headers: {
+                      "X-CSRF-TOKEN": csrfToken,  // Add CSRF token
+                  },
+              }
+          );
+          return response.data; // Return the response data or a success message
+      } catch (error) {
+          console.error("Error updating product:", error);
+          throw error; // Optionally throw the error to handle it in the calling function
+      }
   },
+
+
+
+  // updateProduct: async (id: any, updatedProduct: any) => {
+  //   const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content'); // Ambil token CSRF
+  //   try {
+  //     const response = await axios.put(
+  //       `http://localhost:8000/api/products/update/${id}`,
+  //       updatedProduct,
+  //       {
+  //         headers: {
+  //           "X-CSRF-TOKEN": csrfToken,  // Menambahkan token CSRF
+  //         },
+  //       }
+  //     );
+  //     set((state: { products: any[]; }) => ({
+  //       products: state.products.map((product: { id: any; }) =>
+  //         product.id === id ? { ...product, ...response.data.data } : product
+  //       ),
+  //     }));
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // },
   
 
   // Fungsi untuk menghapus produk

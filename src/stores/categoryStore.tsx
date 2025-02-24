@@ -20,6 +20,7 @@ const categoryStore = create((set) => ({
   error: null,  
   
 
+
   fetchCategories: async () => {  
     set({ loading: true });  
     try {  
@@ -68,8 +69,22 @@ const categoryStore = create((set) => ({
     }
   },
 
-
-
+  deleteCategory: async (id: any) => {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content'); // Ambil token CSRF
+    try {
+      await axios.delete(`http://localhost:8000/api/categories/delete/${id}`, {
+        headers: {
+          "X-CSRF-TOKEN": csrfToken,  // Menambahkan token CSRF
+        },
+      });
+      set((state: { categories: any[]; }) => ({
+        categories: state.categories.filter((category: { id: any; }) => category.id !== id),
+      }));
+    } catch (error) {
+      console.error(error);
+    }
+  },
+  
 }));  
   
 export default categoryStore;  

@@ -1,23 +1,40 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import productStore from '../../../stores/productStore';
+import { Product } from '../../../types/Product';
+
+
+
+interface product {
+  id: number; // or string, depending on your data
+  name: string;
+  selling_price: number;
+}
 
 const ProductEdit = () => {
-  const { id } = useParams();
   const navigate = useNavigate();
+  const [error, setError] = useState('');
+  const { id } = useParams<{ id: string }>(); // Extracting id from URL parameters
+  const numericId = Number(id); // Convert id to a number
   const [name, setName] = useState('');
   const [selling_price, setSellingPrice] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(true); // To handle loading state
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
+  
+  // const { fetchProductById, updateProduct } = productStore(); 
 
-  const fetchProductById = productStore((state) => state.fetchProductById);
-  const updateProduct = productStore((state) => state.updateProduct);
+  const { fetchProductById } = productStore() as {
+    fetchProductById: (id: number,) => Promise<Product>;
+    updateProduct: (product: Product) => Promise<void>;
+    error: string | null;
+  };
 
   useEffect(() => {
     if (!id) return; // Early exit if id is not available
     const fetchData = async () => {
       setLoading(true); // Set loading to true when starting the fetch
-      const product = await fetchProductById(id); // Use id from URL
+      const productId = Number(id); // Convert id to a number
+      const product = await fetchProductById(productId); 
       if (product) {
         setName(product.name);
         setSellingPrice(product.selling_price);
@@ -31,30 +48,19 @@ const ProductEdit = () => {
     fetchData();
   }, [id, fetchProductById]);
 
-  const handleUpdate = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleUpdate = async () => {
     setLoading(true);
-
-    if (!name || !selling_price) {
-      setError('All fields are required');
-      return;
+    try {
+      const updateData = { name, selling_price: parseFloat(selling_price) }; // Create the updated product object
+      await updateProduct(numericId, updateData); // Pass id and updated data
+      alert("Data berhasil diupdate!");
+    } catch (error) {
+      alert("Data gagal diupdate!");
+    } finally {
+      setLoading(false);
     }
-
-    const update_data = await updateProduct(id, {name,selling_price});
-
-    setLoading(false);
-
-    if (update_data) {
-      alert("data gagal di update !");
-    }else{
-      alert("data berhasil di update !");
-    }
-
   };
-
-  if (loading) {
-    return <p>Loading...</p>; // Show loading message while fetching data
-  }
+  
 
   return (
     <div>
